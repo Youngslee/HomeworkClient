@@ -17,8 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -27,54 +26,63 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 
 import line.homework.R;
 
 
 public class DisplayClien extends Activity {
     private final String targetUri = "http://10.70.25.20:8080";
+    private CustomListViewAdapter adapter = new CustomListViewAdapter();
+    HashMap<String,String> urlmapper = new HashMap<String,String>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_clien);
 
         ListView listview = (ListView) findViewById(R.id.customListView1);
-        CustomListViewAdapter adapter = new CustomListViewAdapter();
-
 
         listview.setAdapter(adapter);
 
-//        Thread mThread = new Thread(){
-//            @Override
-//            public void run(){
-//                try{
-//                    URL url = new URL(targetUri);
-//                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//                    if(urlConnection.getResponseCode()==200){
-//                        //SUCCESS
-//                        InputStream inputstream= new BufferedInputStream(urlConnection.getInputStream());
-//                        InputStreamReader inputReader = new InputStreamReader(inputstream,"UTF-8");
-//                        JsonReader jsonReader = new JsonReader(inputReader);
-//
-//                    }else{
-//                        //ERROR
-//                        Log.d("err","connection 에러");
-//                    }
-//                }  catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//        mThread.start();
-//        try{
-//            mThread.join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        Thread mThread = new Thread(){
+            @Override
+            public void run(){
+                try{
+                    URL url = new URL(targetUri);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    if(urlConnection.getResponseCode()==200){
+                        //SUCCESS
+                        InputStream inputstream= new BufferedInputStream(urlConnection.getInputStream());
+                        Log.d("d","ok");
+                        InputStreamReader inputReader = new InputStreamReader(inputstream,"UTF-8");
+                        BufferedReader br = new BufferedReader(inputReader);
 
-        adapter.addItem("라이프체인1","이영섭","1");
-        adapter.addItem("라이프체인2","정찬구","2");
-        adapter.addItem("라이프체인3","고태건","3");
+                        JsonReader jsonReader = new JsonReader(br);
+                        jsonReader.beginObject();
+                        while (jsonReader.hasNext()) {
+                            String key = jsonReader.nextName();
+                            String v1 = jsonReader.nextString();
+
+                            adapter.addItem(key, "", "");
+                            urlmapper.put(key, v1);
+                        }
+                    }else{
+                        //ERROR
+                        Log.d("err","connection 에러");
+                    }
+                }  catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        mThread.start();
+        try{
+            mThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -86,7 +94,7 @@ public class DisplayClien extends Activity {
                 String viewsStr = item.getViews();
 
                 Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
-                transitionIntent.putExtra("url","https://www.clien.net/service/board/park/11649394?po=0&od=T31&sk=&sv=&category=&groupCd=&articlePeriod=default&pt=0");
+                transitionIntent.putExtra("url",urlmapper.get(titleStr));
 
                 startActivity(transitionIntent);
             }

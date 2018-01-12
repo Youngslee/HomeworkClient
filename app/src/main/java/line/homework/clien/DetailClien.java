@@ -30,8 +30,6 @@ import line.homework.R;
 
 public class DetailClien extends Activity {
     private TextView detailTitle;
-    //private final TextView detailnickname = (TextView) findViewById(R.id.detailnickname);
-    //private final TextView detailcontents = (TextView) findViewById(R.id.detailcontents);
     private Document doc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

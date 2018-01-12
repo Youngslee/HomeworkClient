@@ -84,10 +84,12 @@ public class LoginActivity extends Activity {
                 String accessToken = result.getLineCredential().getAccessToken().getAccessToken();
                 LineProfile profile = result.getLineProfile();
                 dbHelper.insert(profile.getUserId(),profile.getDisplayName(),profile.getPictureUrl().toString());
-                Intent transitionIntent = new Intent(this, LoginResultActivity.class);
-                transitionIntent.putExtra("line_profile_id", profile.getUserId());
-                transitionIntent.putExtra("line_profile_name", profile.getDisplayName());
-                transitionIntent.putExtra("line_profile_url", profile.getPictureUrl().toString());
+//                Intent transitionIntent = new Intent(this, LoginResultActivity.class);
+//                transitionIntent.putExtra("line_profile_id", profile.getUserId());
+//                transitionIntent.putExtra("line_profile_name", profile.getDisplayName());
+//                transitionIntent.putExtra("line_profile_url", profile.getPictureUrl().toString());
+//                startActivity(transitionIntent);
+                Intent transitionIntent = new Intent(this, DisplayClien.class);
                 startActivity(transitionIntent);
 
                 break;
