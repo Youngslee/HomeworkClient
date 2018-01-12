@@ -10,16 +10,20 @@ package line.homework.logintest;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.linecorp.linesdk.LineProfile;
 import com.linecorp.linesdk.auth.LineLoginApi;
 import com.linecorp.linesdk.auth.LineLoginResult;
 
 import line.homework.R;
+import line.homework.clien.DetailClien;
 import line.homework.clien.DisplayClien;
 
 public class LoginActivity extends Activity {
@@ -30,12 +34,22 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        FirebaseInstanceId.getInstance().getToken();
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Log.d("debugtoken",token);
+        String url="";
+        Intent intent = getIntent();
 
+        Bundle bundle = intent.getExtras();
+        if( bundle != null){
+            if(bundle.getString("url") != null && !bundle.getString("url").equalsIgnoreCase("")) {
+                url = bundle.getString("url");
+            }
+        }
         // DBHelper class : 라인 프로필 관련 데이터베이스 관리 클래스
         dbHelper= new DBHelper(this.getApplicationContext(), "LoginInfo.db", null, 1);
 
-        String[] dbInfo=dbHelper.checkLogin();
-        if(dbInfo[0]!=null){
+        if(chkLogin()){
             /*
                 checkLogin() 수행 후, 첫번째 element에 데이터가 없다면 초기 실행으로 간주
                 그렇지 않다면, 초기 실행 이후 실행으로 간주
@@ -49,8 +63,18 @@ public class LoginActivity extends Activity {
 //            transitionIntent.putExtra("line_profile_name", dbInfo[1]);
 //            transitionIntent.putExtra("line_profile_url", dbInfo[2]);
 
-            Intent transitionIntent = new Intent(this, DisplayClien.class);
-            startActivity(transitionIntent);
+            if(chkPushMsg(url)){
+                Intent transitionIntent = new Intent(this, DisplayClien.class);
+                transitionIntent.putExtra("url",url);
+                Log.d("dubugurl",url);
+                startActivity(transitionIntent);
+            }else {
+                Intent transitionIntent = new Intent(this, DisplayClien.class);
+                startActivity(transitionIntent);
+            }
+
+//            Intent transitionIntent = new Intent(this, DisplayClien.class);
+//            startActivity(transitionIntent);
         }
 
         final Button loginButton = (Button) findViewById(R.id.login_button);
@@ -102,6 +126,22 @@ public class LoginActivity extends Activity {
                 Log.e("ERROR", "Login FAILED!");
                 Log.e("ERROR", result.getErrorData().toString());
         }
+    }
+    public boolean chkLogin() {
+        // 읽기가 가능하게 DB 열기
+        Cursor cursor = dbHelper.select();
+        String[] dbInfo = new String[3];
+        // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
+        while(cursor.moveToNext()){
+            dbInfo[0]=cursor.getString(1); // userId
+            dbInfo[1]=cursor.getString(2); // userName
+            dbInfo[2]=cursor.getString(3); // pictureUrl
+        }
+        return dbInfo[0]!=null;
+    }
+    public boolean chkPushMsg(String url) {
+        // 푸시메시지를 받았는지 체크
+        return url.length()>0;
     }
 
 

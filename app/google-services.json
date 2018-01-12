@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "324260028877",
+    "firebase_url": "https://clienpush.firebaseio.com",
+    "project_id": "clienpush",
+    "storage_bucket": "clienpush.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324260028877:android:6e8e54efc8ad5cd0",
+        "android_client_info": {
+          "package_name": "line.homework.logintest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324260028877-p06rlk1u8h6hr87mtmauenulfgu1eq2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGCZ1JepzYYDVPkNdfcwQqAZhMDMx5rw8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

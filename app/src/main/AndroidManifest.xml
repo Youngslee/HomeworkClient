@@ -19,6 +19,19 @@
         <activity android:name=".logintest.LoginResultActivity"/>
         <activity android:name=".clien.DisplayClien"/>
         <activity android:name=".clien.DetailClien"/>
+        <service
+            android:name=".clien.FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".clien.FirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

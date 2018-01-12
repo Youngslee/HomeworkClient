@@ -34,13 +34,24 @@ import line.homework.R;
 public class DisplayClien extends Activity {
     private final String targetUri = "http://10.70.25.20:8080";
     private CustomListViewAdapter adapter = new CustomListViewAdapter();
-    HashMap<String,String> urlmapper = new HashMap<String,String>();
+    HashMap<String,String> urlMapper = new HashMap<String,String>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_clien);
+        Intent intent = getIntent();
+        String url="";
+        url = intent.getStringExtra("url");
+        if(url!=null)
+            Log.d("dubugurl",url);
+        if(chkPushMsg(url)){
+            Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
+            transitionIntent.putExtra("url",url);
 
+            startActivity(transitionIntent);
+        }
         ListView listview = (ListView) findViewById(R.id.customListView1);
 
         listview.setAdapter(adapter);
@@ -65,7 +76,7 @@ public class DisplayClien extends Activity {
                             String v1 = jsonReader.nextString();
 
                             adapter.addItem(key, "", "");
-                            urlmapper.put(key, v1);
+                            urlMapper.put(key, v1);
                         }
                     }else{
                         //ERROR
@@ -90,15 +101,19 @@ public class DisplayClien extends Activity {
                 // get item
                 CustomListViewItem item = (CustomListViewItem) parent.getItemAtPosition(position) ;
                 String titleStr = item.getTitle() ;
-                String writerStr = item.getWriter() ;
-                String viewsStr = item.getViews();
+//                String writerStr = item.getWriter() ;
+//                String viewsStr = item.getViews();
 
                 Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
-                transitionIntent.putExtra("url",urlmapper.get(titleStr));
+                transitionIntent.putExtra("url",urlMapper.get(titleStr));
 
                 startActivity(transitionIntent);
             }
         }) ;
 
+    }
+    public boolean chkPushMsg(String url) {
+        // 푸시메시지를 받았는지 체크
+        return url!=null;
     }
 }
