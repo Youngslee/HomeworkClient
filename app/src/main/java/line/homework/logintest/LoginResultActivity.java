@@ -26,6 +26,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import line.homework.R;
+
 
 public class LoginResultActivity extends Activity {
     private String intent_userId;

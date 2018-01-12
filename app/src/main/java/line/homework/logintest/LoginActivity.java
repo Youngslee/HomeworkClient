@@ -19,6 +19,9 @@ import com.linecorp.linesdk.LineProfile;
 import com.linecorp.linesdk.auth.LineLoginApi;
 import com.linecorp.linesdk.auth.LineLoginResult;
 
+import line.homework.R;
+import line.homework.clien.DisplayClien;
+
 public class LoginActivity extends Activity {
     private static final int REQUEST_CODE = 1;
     private DBHelper dbHelper;
@@ -37,10 +40,16 @@ public class LoginActivity extends Activity {
                 checkLogin() 수행 후, 첫번째 element에 데이터가 없다면 초기 실행으로 간주
                 그렇지 않다면, 초기 실행 이후 실행으로 간주
              */
-            Intent transitionIntent = new Intent(this, LoginResultActivity.class);
-            transitionIntent.putExtra("line_profile_id", dbInfo[0]);
-            transitionIntent.putExtra("line_profile_name", dbInfo[1]);
-            transitionIntent.putExtra("line_profile_url", dbInfo[2]);
+            /*
+                Homework 1 LoginTest에 관련된 intent 처리
+             */
+//            Intent transitionIntent = new Intent(this, LoginResultActivity.class);
+//
+//            transitionIntent.putExtra("line_profile_id", dbInfo[0]);
+//            transitionIntent.putExtra("line_profile_name", dbInfo[1]);
+//            transitionIntent.putExtra("line_profile_url", dbInfo[2]);
+
+            Intent transitionIntent = new Intent(this, DisplayClien.class);
             startActivity(transitionIntent);
         }
 
