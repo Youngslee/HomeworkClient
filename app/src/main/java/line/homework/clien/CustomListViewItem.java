@@ -11,9 +11,9 @@ package line.homework.clien;
 
 
 public class CustomListViewItem {
-    private String titleStr ;
-    private String writerStr ;
-    private String viewsStr ;
+    private String titleStr ; // 타이틀
+    private String writerStr ; // 작성자
+    private String viewsStr ; // 조회수
 
     public void setTitle(String title) {
         titleStr = title ;

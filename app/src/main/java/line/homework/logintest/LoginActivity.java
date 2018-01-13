@@ -35,17 +35,19 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         FirebaseInstanceId.getInstance().getToken();
-        String token = FirebaseInstanceId.getInstance().getToken();
-        Log.d("debugtoken",token);
+
+        /*
+            push 알림을 받고, 해당 키워드의 url을 받기
+         */
         String url="";
         Intent intent = getIntent();
-
         Bundle bundle = intent.getExtras();
         if( bundle != null){
             if(bundle.getString("url") != null && !bundle.getString("url").equalsIgnoreCase("")) {
                 url = bundle.getString("url");
             }
         }
+
         // DBHelper class : 라인 프로필 관련 데이터베이스 관리 클래스
         dbHelper= new DBHelper(this.getApplicationContext(), "LoginInfo.db", null, 1);
 
@@ -64,9 +66,12 @@ public class LoginActivity extends Activity {
 //            transitionIntent.putExtra("line_profile_url", dbInfo[2]);
 
             if(chkPushMsg(url)){
+                /*
+                    push 알림으로 어플리케이션을 구동했는지 검사,
+                    알림에서 받은 url을 전달해 이후에 해당 키워드에 대한 상세내용 출력
+                 */
                 Intent transitionIntent = new Intent(this, DisplayClien.class);
                 transitionIntent.putExtra("url",url);
-                Log.d("dubugurl",url);
                 startActivity(transitionIntent);
             }else {
                 Intent transitionIntent = new Intent(this, DisplayClien.class);
@@ -128,10 +133,13 @@ public class LoginActivity extends Activity {
         }
     }
     public boolean chkLogin() {
-        // 읽기가 가능하게 DB 열기
+        /*
+            이 전에 인증을 수행했는지 검사.
+         */
+        // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
         Cursor cursor = dbHelper.select();
         String[] dbInfo = new String[3];
-        // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
+
         while(cursor.moveToNext()){
             dbInfo[0]=cursor.getString(1); // userId
             dbInfo[1]=cursor.getString(2); // userName

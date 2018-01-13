@@ -1,3 +1,11 @@
+/*
+ * 클래스 이름 : FirebaseMessagingService
+ *  - 앱의 알림을 수신, 데이터 수신 등을 위한 클래스
+ * 버전 정보
+ *
+ * 날짜 : 2018.01.12
+ *
+ */
 package line.homework.clien;
 
 import android.app.NotificationManager;

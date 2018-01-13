@@ -20,6 +20,7 @@ import line.homework.R;
 
 
 public class CustomListViewAdapter extends BaseAdapter {
+
     // Adapter에 추가된 데이터를 저장하기 위한 ArrayList
     private ArrayList<CustomListViewItem> listViewItemList = new ArrayList<CustomListViewItem>() ;
 
@@ -66,7 +67,7 @@ public class CustomListViewAdapter extends BaseAdapter {
         return listViewItemList.get(position) ;
     }
 
-    // 아이템 데이터 추가를 위한 함수
+    // 아이템 데이터 추가 함수
     public void addItem(String title, String writer, String views) {
         CustomListViewItem item = new CustomListViewItem();
         item.setTitle(title);

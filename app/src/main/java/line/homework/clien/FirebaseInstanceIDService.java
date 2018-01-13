@@ -1,3 +1,11 @@
+/*
+ * 클래스 이름 : FirebaseInstanceIDService
+ *  - 등록 토큰 생성, 순환, 업데이트 처리를 위한 클래스
+ * 버전 정보
+ *
+ * 날짜 : 2018.01.12
+ *
+ */
 package line.homework.clien;
 import android.util.Log;
 
