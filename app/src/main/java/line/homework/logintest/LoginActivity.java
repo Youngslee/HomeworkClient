@@ -59,7 +59,7 @@ public class LoginActivity extends Activity {
                 그렇지 않다면, 초기 실행 이후 실행으로 간주
              */
 
-            FirebaseInstanceId.getInstance().getToken();
+            //FirebaseInstanceId.getInstance().getToken();
 
             if(chkPushMsg(url)){
                 /*

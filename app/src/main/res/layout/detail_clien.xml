@@ -16,12 +16,19 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:button="@android:drawable/btn_star" />
+            <Button
+                android:id="@+id/keywordbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_below="@+id/btn_star"
+                android:text="키워드 교체" />
             <TextView
         android:id="@+id/detailtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-                android:layout_below="@+id/btn_star"
+                android:layout_below="@+id/keywordbutton"
         android:text="TextView" />
 
          <TextView

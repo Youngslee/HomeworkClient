@@ -37,7 +37,7 @@ import line.homework.R;
 
 
 public class DisplayClien extends Activity {
-    private final String targetUri = "http://10.70.39.21:8080/browse";
+    private final String targetUri = "http://10.70.38.128:8080/browse";
     private CustomListViewAdapter adapter = new CustomListViewAdapter();
     private HashMap<String,String> urlMapper = new HashMap<String,String>();
     private ListView listview;
