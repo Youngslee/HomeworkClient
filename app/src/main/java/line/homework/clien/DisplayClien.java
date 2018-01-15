@@ -9,6 +9,8 @@
 package line.homework.clien;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -44,21 +46,27 @@ public class DisplayClien extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_clien);
+
+        /*
+            push 메시지의 data에 대한 세부 내용을 바로 도식하기 위한 처리
+         */
         Intent intent = getIntent();
         String url="";
-        url = intent.getStringExtra("url");
-        if(chkPushMsg(url)){
-            Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
-            transitionIntent.putExtra("url",url);
-
-            startActivity(transitionIntent);
+        if(intent.getStringExtra("url")!=null){
+            url = intent.getStringExtra("url");
+            if(chkPushMsg(url)){
+                Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
+                transitionIntent.putExtra("url",url);
+                startActivity(transitionIntent);
+            }
         }
 
-
-//        DetailAsyncTask detailAsync = new DetailAsyncTask();
-//        detailAsync.execute();
         listview = (ListView) findViewById(R.id.customListView1);
         listview.setAdapter(adapter);
+
+
+        //        DetailAsyncTask detailAsync = new DetailAsyncTask();
+        //        detailAsync.execute();
         /*
             thread -> asyncTask 수정 필요
          */
@@ -79,13 +87,19 @@ public class DisplayClien extends Activity {
                         while (jsonReader.hasNext()) {
                             String key = jsonReader.nextName();
                             String v1 = jsonReader.nextString();
-
+                            // String v2 =jsonReader.nextName();
                             adapter.addItem(key, "", "");
                             urlMapper.put(key, v1);
                         }
                     }else{
                         //ERROR
-                        Log.d("err","connection 에러");
+                        new AlertDialog.Builder(DisplayClien.this).setTitle("ERROR")
+                                .setMessage("Connection Error!!")
+                                .setNeutralButton("닫기", new DialogInterface.OnClickListener(){
+                                    public void onClick(DialogInterface dlg, int something){
+
+                                    }
+                                }).show();
                     }
                 }  catch (IOException e) {
                     e.printStackTrace();
@@ -105,6 +119,9 @@ public class DisplayClien extends Activity {
                 // get item
                 CustomListViewItem item = (CustomListViewItem) parent.getItemAtPosition(position) ;
                 String titleStr = item.getTitle() ;
+                /*
+                    작성자와 작성 시간 추가 필요
+                 */
 //                String writerStr = item.getWriter() ;
 //                String viewsStr = item.getViews();
 
@@ -116,74 +133,77 @@ public class DisplayClien extends Activity {
         }) ;
 
     }
-    class DetailAsyncTask extends AsyncTask<Void, Integer, Void> {
-        // doInBackground 메소드가 실행되기 전에 실행되는 메소드
-        @Override
-        protected void onPreExecute () {
-            super.onPreExecute();
-            try{
-                listview = (ListView) findViewById(R.id.customListView1);
-                listview.setAdapter(adapter);
-                URL url = new URL(targetUri);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                if(urlConnection.getResponseCode()==200){
-                    //SUCCESS
-                    InputStream inputstream= new BufferedInputStream(urlConnection.getInputStream());
-                    InputStreamReader inputReader = new InputStreamReader(inputstream,"UTF-8");
-                    BufferedReader br = new BufferedReader(inputReader);
-
-                    JsonReader jsonReader = new JsonReader(br);
-                    jsonReader.beginObject();
-                    while (jsonReader.hasNext()) {
-                        String key = jsonReader.nextName();
-                        String v1 = jsonReader.nextString();
-                        Log.d("key",key+":"+v1);
-                        adapter.addItem(key, "", "");
-                        urlMapper.put(key, v1);
-                    }
-                }else{
-                    //ERROR
-                    Log.d("err","connection 에러");
-                }
-            }  catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // 실제 비즈니스 로직이 처리될 메소드(Thread 부분이라고 생각하면 됨)
-        @Override
-        protected Void doInBackground (Void...params){
-
-            return null;
-        }
-
-        // doInBackground에서 넘긴 values 값을 받아서 처리하는 부분
-        @Override
-        protected void onProgressUpdate (Integer...values){
-        }
-
-        // 모든 작업이 끝난 후 처리되는 메소드
-        @Override
-        protected void onPostExecute (Void result){
-            super.onPostExecute(result);
-            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView parent, View v, int position, long id) {
-                    Log.d("debugItem",parent+":"+v+":"+position+":"+id);
-                    // get item
-                    CustomListViewItem item = (CustomListViewItem) parent.getItemAtPosition(position) ;
-                    String titleStr = item.getTitle() ;
-//                String writerStr = item.getWriter() ;
-//                String viewsStr = item.getViews();
-
-                    Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
-                    transitionIntent.putExtra("url",urlMapper.get(titleStr));
-
-                    startActivity(transitionIntent);
-                }
-            }) ;
-        }
-    }
+    /*
+        AsyncTask로 수정 중
+     */
+//    class DetailAsyncTask extends AsyncTask<Void, Integer, Void> {
+//        // doInBackground 메소드가 실행되기 전에 실행되는 메소드
+//        @Override
+//        protected void onPreExecute () {
+//            super.onPreExecute();
+//            try{
+//                listview = (ListView) findViewById(R.id.customListView1);
+//                listview.setAdapter(adapter);
+//                URL url = new URL(targetUri);
+//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//                if(urlConnection.getResponseCode()==200){
+//                    //SUCCESS
+//                    InputStream inputstream= new BufferedInputStream(urlConnection.getInputStream());
+//                    InputStreamReader inputReader = new InputStreamReader(inputstream,"UTF-8");
+//                    BufferedReader br = new BufferedReader(inputReader);
+//
+//                    JsonReader jsonReader = new JsonReader(br);
+//                    jsonReader.beginObject();
+//                    while (jsonReader.hasNext()) {
+//                        String key = jsonReader.nextName();
+//                        String v1 = jsonReader.nextString();
+//                        Log.d("key",key+":"+v1);
+//                        adapter.addItem(key, "", "");
+//                        urlMapper.put(key, v1);
+//                    }
+//                }else{
+//                    //ERROR
+//                    Log.d("err","connection 에러");
+//                }
+//            }  catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        // 실제 비즈니스 로직이 처리될 메소드(Thread 부분이라고 생각하면 됨)
+//        @Override
+//        protected Void doInBackground (Void...params){
+//
+//            return null;
+//        }
+//
+//        // doInBackground에서 넘긴 values 값을 받아서 처리하는 부분
+//        @Override
+//        protected void onProgressUpdate (Integer...values){
+//        }
+//
+//        // 모든 작업이 끝난 후 처리되는 메소드
+//        @Override
+//        protected void onPostExecute (Void result){
+//            super.onPostExecute(result);
+//            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(AdapterView parent, View v, int position, long id) {
+//                    Log.d("debugItem",parent+":"+v+":"+position+":"+id);
+//                    // get item
+//                    CustomListViewItem item = (CustomListViewItem) parent.getItemAtPosition(position) ;
+//                    String titleStr = item.getTitle() ;
+////                String writerStr = item.getWriter() ;
+////                String viewsStr = item.getViews();
+//
+//                    Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
+//                    transitionIntent.putExtra("url",urlMapper.get(titleStr));
+//
+//                    startActivity(transitionIntent);
+//                }
+//            }) ;
+//        }
+//    }
     public boolean chkPushMsg(String url) {
         // 푸시메시지를 받았는지 체크
         return url!=null;

@@ -9,6 +9,8 @@
 package line.homework.logintest;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,24 +33,23 @@ import line.homework.clien.DisplayClien;
 public class LoginActivity extends Activity {
     private static final int REQUEST_CODE = 1;
     private DBHelper dbHelper;
+    private final String targetUri = "http://10.70.39.21:8080/myKeyword";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        FirebaseInstanceId.getInstance().getToken();
-        Log.d("debugToken",FirebaseInstanceId.getInstance().getToken());
+
+
         /*
             push 알림을 받고, 해당 키워드의 url을 받기
          */
         String url="";
         Intent intent = getIntent();
-        HashMap<String,String> hashMap = (HashMap<String, String>)intent.getSerializableExtra("hashMap") ;
-        if(hashMap!=null) {
-            for (String k : hashMap.keySet()) {
-                Log.d("receive", hashMap.get(k) + "");
-            }
+        if(intent.getStringExtra("pushURL")!=null){
+            url = intent.getStringExtra("pushURL") ;
         }
+
         // DBHelper class : 라인 프로필 관련 데이터베이스 관리 클래스
         dbHelper= new DBHelper(this.getApplicationContext(), "LoginInfo.db", null, 1);
 
@@ -57,14 +58,8 @@ public class LoginActivity extends Activity {
                 checkLogin() 수행 후, 첫번째 element에 데이터가 없다면 초기 실행으로 간주
                 그렇지 않다면, 초기 실행 이후 실행으로 간주
              */
-            /*
-                Homework 1 LoginTest에 관련된 intent 처리
-             */
-//            Intent transitionIntent = new Intent(this, LoginResultActivity.class);
-//
-//            transitionIntent.putExtra("line_profile_id", dbInfo[0]);
-//            transitionIntent.putExtra("line_profile_name", dbInfo[1]);
-//            transitionIntent.putExtra("line_profile_url", dbInfo[2]);
+
+            FirebaseInstanceId.getInstance().getToken();
 
             if(chkPushMsg(url)){
                 /*
@@ -91,8 +86,13 @@ public class LoginActivity extends Activity {
                     startActivityForResult(loginIntent, REQUEST_CODE);
                 }
                 catch(Exception e) {
-                    Log.e("ERROR","에러");
-                    Log.e("ERROR", e.toString());
+                    new AlertDialog.Builder(LoginActivity.this).setTitle("ERROR")
+                            .setMessage("Authentication Error")
+                            .setNeutralButton("닫기", new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dlg, int something){
+
+                                }
+                            }).show();
                 }
             }
         });
@@ -111,23 +111,28 @@ public class LoginActivity extends Activity {
                 String accessToken = result.getLineCredential().getAccessToken().getAccessToken();
                 LineProfile profile = result.getLineProfile();
                 dbHelper.insert(profile.getUserId(),profile.getDisplayName(),profile.getPictureUrl().toString());
-//                Intent transitionIntent = new Intent(this, LoginResultActivity.class);
-//                transitionIntent.putExtra("line_profile_id", profile.getUserId());
-//                transitionIntent.putExtra("line_profile_name", profile.getDisplayName());
-//                transitionIntent.putExtra("line_profile_url", profile.getPictureUrl().toString());
-//                startActivity(transitionIntent);
                 Intent transitionIntent = new Intent(this, DisplayClien.class);
                 startActivity(transitionIntent);
-
                 break;
             case CANCEL:
                 // Login canceled by user
-                Log.e("ERROR", "LINE Login Canceled by user!!");
+                new AlertDialog.Builder(this).setTitle("ERROR")
+                        .setMessage("LINE Login Canceled by user!!")
+                        .setNeutralButton("닫기", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dlg, int something){
+
+                            }
+                        }).show();
                 break;
             default:
                 // Login canceled due to other error
-                Log.e("ERROR", "Login FAILED!");
-                Log.e("ERROR", result.getErrorData().toString());
+                new AlertDialog.Builder(this).setTitle("ERROR")
+                        .setMessage("Login FAILED!")
+                        .setNeutralButton("닫기", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dlg, int something){
+
+                            }
+                        }).show();
         }
     }
     public boolean chkLogin() {

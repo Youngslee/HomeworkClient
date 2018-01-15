@@ -8,9 +8,6 @@
  */
 package line.homework.clien;
 
-
-import android.widget.CheckBox;
-
 public class CustomListViewItem {
     private String titleStr ; // 타이틀
     private String writerStr ; // 작성자

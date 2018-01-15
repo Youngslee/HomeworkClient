@@ -37,43 +37,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     private static final String TAG = "FirebaseMsgService";
 
     private String msg;
-//    private Map<String,String> data = new HashMap<String,String>();
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-
-//        // Check if message contains a data payload.
-//            if (remoteMessage.getData().size() > 0) {
-                Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-//                data = remoteMessage.getData();
-//                try {
-//                    for(String k : data.keySet()) {
-//                        URLDecoder.decode(data.get(k), "EUC-KR");
-//                        Log.d(TAG, "Message data payload: " + data.get(k));
-//                    }
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        // Check if message contains a notification payload.
-//        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-//            msg = remoteMessage.getNotification().getBody();
-//            try {
-//                msg= URLDecoder.decode(msg,"EUC-KR");
-//
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-//            Log.d(TAG, "Message Notification Body: " + msg);
-//        }
-//
-//
-//        if (remoteMessage.getData().size() > 0) {
-//            sendNotification(msg,(HashMap)remoteMessage.getData());
-//        }else{
-//            sendNotification(msg,null);
-//        }
         JSONObject json = new JSONObject(remoteMessage.getData());
         try {
             sendNotification(json);
@@ -85,28 +50,24 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String title = null;
         try {
             title = URLDecoder.decode(json.get("title").toString(), "UTF-8");
-
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         String url = json.get("URL").toString();
         Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("pushURL",url);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1 /* Request code */, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(url)
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setVibrate(new long[]{1, 1000});
-
+                .setVibrate(new long[]{1, 1000})
+                .setContentIntent(pendingIntent);
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         notificationManager.notify(0 /* ID of notification */, mBuilder.build());
-
-        mBuilder.setContentIntent(pendingIntent);
     }
 }
