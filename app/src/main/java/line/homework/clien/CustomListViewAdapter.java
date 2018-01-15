@@ -42,6 +42,7 @@ public class CustomListViewAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.customlistview_item, parent, false);
         }
 
+
         TextView titleTextView = (TextView) convertView.findViewById(R.id.title) ;
         TextView writerTextView = (TextView) convertView.findViewById(R.id.writer) ;
         TextView viewsTextView = (TextView) convertView.findViewById(R.id.views) ;
@@ -50,7 +51,7 @@ public class CustomListViewAdapter extends BaseAdapter {
 
         titleTextView.setText(listViewItem.getTitle());
         writerTextView.setText(listViewItem.getWriter());
-        viewsTextView.setText(listViewItem.getViews());
+        viewsTextView.setText(listViewItem.getTimes());
 
         return convertView;
     }
@@ -68,12 +69,14 @@ public class CustomListViewAdapter extends BaseAdapter {
     }
 
     // 아이템 데이터 추가 함수
-    public void addItem(String title, String writer, String views) {
+    public void addItem(String title, String writer, String times) {
         CustomListViewItem item = new CustomListViewItem();
+
         item.setTitle(title);
         item.setWriter(writer);
-        item.setViews(views);
+        item.setTimes(times);
 
         listViewItemList.add(item);
     }
+
 }

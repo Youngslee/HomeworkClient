@@ -22,6 +22,8 @@ import com.linecorp.linesdk.LineProfile;
 import com.linecorp.linesdk.auth.LineLoginApi;
 import com.linecorp.linesdk.auth.LineLoginResult;
 
+import java.util.HashMap;
+
 import line.homework.R;
 import line.homework.clien.DetailClien;
 import line.homework.clien.DisplayClien;
@@ -35,19 +37,18 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         FirebaseInstanceId.getInstance().getToken();
-
+        Log.d("debugToken",FirebaseInstanceId.getInstance().getToken());
         /*
             push 알림을 받고, 해당 키워드의 url을 받기
          */
         String url="";
         Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        if( bundle != null){
-            if(bundle.getString("url") != null && !bundle.getString("url").equalsIgnoreCase("")) {
-                url = bundle.getString("url");
+        HashMap<String,String> hashMap = (HashMap<String, String>)intent.getSerializableExtra("hashMap") ;
+        if(hashMap!=null) {
+            for (String k : hashMap.keySet()) {
+                Log.d("receive", hashMap.get(k) + "");
             }
         }
-
         // DBHelper class : 라인 프로필 관련 데이터베이스 관리 클래스
         dbHelper= new DBHelper(this.getApplicationContext(), "LoginInfo.db", null, 1);
 
@@ -77,9 +78,6 @@ public class LoginActivity extends Activity {
                 Intent transitionIntent = new Intent(this, DisplayClien.class);
                 startActivity(transitionIntent);
             }
-
-//            Intent transitionIntent = new Intent(this, DisplayClien.class);
-//            startActivity(transitionIntent);
         }
 
         final Button loginButton = (Button) findViewById(R.id.login_button);

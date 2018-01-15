@@ -9,11 +9,12 @@
 package line.homework.clien;
 
 
+import android.widget.CheckBox;
 
 public class CustomListViewItem {
     private String titleStr ; // 타이틀
     private String writerStr ; // 작성자
-    private String viewsStr ; // 조회수
+    private String viewsStr ; // 작성 시간
 
     public void setTitle(String title) {
         titleStr = title ;
@@ -21,8 +22,8 @@ public class CustomListViewItem {
     public void setWriter(String writer) {
         writerStr = writer ;
     }
-    public void setViews(String views) {
-        viewsStr = views ;
+    public void setTimes(String times) {
+        viewsStr = times ;
     }
 
     public String getTitle() {
@@ -31,7 +32,7 @@ public class CustomListViewItem {
     public String getWriter() {
         return this.writerStr ;
     }
-    public String getViews() {
+    public String getTimes() {
         return this.viewsStr ;
     }
 }

@@ -10,6 +10,8 @@ package line.homework.clien;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.util.Log;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -32,10 +35,10 @@ import line.homework.R;
 
 
 public class DisplayClien extends Activity {
-    private final String targetUri = "http://10.70.25.20:8080";
+    private final String targetUri = "http://10.70.39.21:8080/browse";
     private CustomListViewAdapter adapter = new CustomListViewAdapter();
-    HashMap<String,String> urlMapper = new HashMap<String,String>();
-
+    private HashMap<String,String> urlMapper = new HashMap<String,String>();
+    private ListView listview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +47,21 @@ public class DisplayClien extends Activity {
         Intent intent = getIntent();
         String url="";
         url = intent.getStringExtra("url");
-        if(url!=null)
-            Log.d("dubugurl",url);
         if(chkPushMsg(url)){
             Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
             transitionIntent.putExtra("url",url);
 
             startActivity(transitionIntent);
         }
-        ListView listview = (ListView) findViewById(R.id.customListView1);
 
+
+//        DetailAsyncTask detailAsync = new DetailAsyncTask();
+//        detailAsync.execute();
+        listview = (ListView) findViewById(R.id.customListView1);
         listview.setAdapter(adapter);
-
+        /*
+            thread -> asyncTask 수정 필요
+         */
         Thread mThread = new Thread(){
             @Override
             public void run(){
@@ -65,7 +71,6 @@ public class DisplayClien extends Activity {
                     if(urlConnection.getResponseCode()==200){
                         //SUCCESS
                         InputStream inputstream= new BufferedInputStream(urlConnection.getInputStream());
-                        Log.d("d","ok");
                         InputStreamReader inputReader = new InputStreamReader(inputstream,"UTF-8");
                         BufferedReader br = new BufferedReader(inputReader);
 
@@ -93,11 +98,10 @@ public class DisplayClien extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View v, int position, long id) {
+                Log.d("debugItem",parent+":"+v+":"+position+":"+id);
                 // get item
                 CustomListViewItem item = (CustomListViewItem) parent.getItemAtPosition(position) ;
                 String titleStr = item.getTitle() ;
@@ -111,6 +115,74 @@ public class DisplayClien extends Activity {
             }
         }) ;
 
+    }
+    class DetailAsyncTask extends AsyncTask<Void, Integer, Void> {
+        // doInBackground 메소드가 실행되기 전에 실행되는 메소드
+        @Override
+        protected void onPreExecute () {
+            super.onPreExecute();
+            try{
+                listview = (ListView) findViewById(R.id.customListView1);
+                listview.setAdapter(adapter);
+                URL url = new URL(targetUri);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                if(urlConnection.getResponseCode()==200){
+                    //SUCCESS
+                    InputStream inputstream= new BufferedInputStream(urlConnection.getInputStream());
+                    InputStreamReader inputReader = new InputStreamReader(inputstream,"UTF-8");
+                    BufferedReader br = new BufferedReader(inputReader);
+
+                    JsonReader jsonReader = new JsonReader(br);
+                    jsonReader.beginObject();
+                    while (jsonReader.hasNext()) {
+                        String key = jsonReader.nextName();
+                        String v1 = jsonReader.nextString();
+                        Log.d("key",key+":"+v1);
+                        adapter.addItem(key, "", "");
+                        urlMapper.put(key, v1);
+                    }
+                }else{
+                    //ERROR
+                    Log.d("err","connection 에러");
+                }
+            }  catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 실제 비즈니스 로직이 처리될 메소드(Thread 부분이라고 생각하면 됨)
+        @Override
+        protected Void doInBackground (Void...params){
+
+            return null;
+        }
+
+        // doInBackground에서 넘긴 values 값을 받아서 처리하는 부분
+        @Override
+        protected void onProgressUpdate (Integer...values){
+        }
+
+        // 모든 작업이 끝난 후 처리되는 메소드
+        @Override
+        protected void onPostExecute (Void result){
+            super.onPostExecute(result);
+            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView parent, View v, int position, long id) {
+                    Log.d("debugItem",parent+":"+v+":"+position+":"+id);
+                    // get item
+                    CustomListViewItem item = (CustomListViewItem) parent.getItemAtPosition(position) ;
+                    String titleStr = item.getTitle() ;
+//                String writerStr = item.getWriter() ;
+//                String viewsStr = item.getViews();
+
+                    Intent transitionIntent = new Intent(DisplayClien.this, DetailClien.class);
+                    transitionIntent.putExtra("url",urlMapper.get(titleStr));
+
+                    startActivity(transitionIntent);
+                }
+            }) ;
+        }
     }
     public boolean chkPushMsg(String url) {
         // 푸시메시지를 받았는지 체크

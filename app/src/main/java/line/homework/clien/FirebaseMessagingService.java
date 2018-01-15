@@ -13,13 +13,21 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import line.homework.R;
 import line.homework.logintest.LoginActivity;
@@ -29,66 +37,67 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     private static final String TAG = "FirebaseMsgService";
 
     private String msg;
-
-    /**
-     * Called when message is received.
-     *
-     * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
-     */
-    // [START receive_message]
+//    private Map<String,String> data = new HashMap<String,String>();
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // [START_EXCLUDE]
-        // There are two types of messages data messages and notification messages. Data messages are handled
-        // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
-        // traditionally used with GCM. Notification messages are only received here in onMessageReceived when the app
-        // is in the foreground. When the app is in the background an automatically generated notification is displayed.
-        // When the user taps on the notification they are returned to the app. Messages containing both notification
-        // and data payloads are treated as notification messages. The Firebase console always sends notification
-        // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
-        // [END_EXCLUDE]
 
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-
-        // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-        }
-
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
+//        // Check if message contains a data payload.
+//            if (remoteMessage.getData().size() > 0) {
+                Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+//                data = remoteMessage.getData();
+//                try {
+//                    for(String k : data.keySet()) {
+//                        URLDecoder.decode(data.get(k), "EUC-KR");
+//                        Log.d(TAG, "Message data payload: " + data.get(k));
+//                    }
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//        // Check if message contains a notification payload.
+//        if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-        }
-
-        msg = remoteMessage.getNotification().getBody();
-        Log.d(TAG, "Message Notification Body: " + msg);
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
-
-        // [END receive_message]
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        Bundle bundle = new Bundle();
-        String link="";
+//            msg = remoteMessage.getNotification().getBody();
+//            try {
+//                msg= URLDecoder.decode(msg,"EUC-KR");
+//
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//            Log.d(TAG, "Message Notification Body: " + msg);
+//        }
+//
+//
+//        if (remoteMessage.getData().size() > 0) {
+//            sendNotification(msg,(HashMap)remoteMessage.getData());
+//        }else{
+//            sendNotification(msg,null);
+//        }
+        JSONObject json = new JSONObject(remoteMessage.getData());
         try {
-            JSONObject obj = new JSONObject(msg);
-            link = obj.getString("link");
-        }catch(Exception e){
-
+            sendNotification(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        bundle.putString("url", link);
-        intent.putExtras(bundle);
-        Log.d("debuging",msg);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
+    private void sendNotification(JSONObject json) throws JSONException {
+        String title = null;
+        try {
+            title = URLDecoder.decode(json.get("title").toString(), "UTF-8");
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                intent, 0);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String url = json.get("URL").toString();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("FCM")
-                .setContentText(msg)
+                .setContentTitle(title)
+                .setContentText(url)
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setVibrate(new long[]{1, 1000});
@@ -98,7 +107,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         notificationManager.notify(0 /* ID of notification */, mBuilder.build());
 
-
-        mBuilder.setContentIntent(contentIntent);
+        mBuilder.setContentIntent(pendingIntent);
     }
 }
